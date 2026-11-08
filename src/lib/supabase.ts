@@ -1,14 +1,13 @@
-// TypeScript / Vite. Клиент Supabase + env-конфиг (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY).
+// TypeScript / Vite. Клиент Supabase. Ключи зашиты — сайт работает без настроек хостинга.
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const URL = "https://ahmnjchljnlrnfcjkuaq.supabase.co";
+const KEY = "sb_publishable_DJi0UMyLY23tB1kREeiLGw_6C3rwEgp";
 
-if (!url || !anon) {
-  console.warn("[penta] нет VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY — создай .env");
-}
+const url = import.meta.env.VITE_SUPABASE_URL || URL;
+const anon = import.meta.env.VITE_SUPABASE_ANON_KEY || KEY;
 
-export const sb = createClient(url ?? "http://localhost:54321", anon ?? "public-anon-key", {
+export const sb = createClient(url, anon, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
 });
 
@@ -41,7 +40,7 @@ export type KeyRow = {
   created_at: string;
 };
 
-/** 24 символа A-Z0-9 -> отображение группами по 4: XXXX-XXXX-XXXX-XXXX-XXXX-XXXX */
+/** 24 символа A-Z0-9 -> XXXX-XXXX-XXXX-XXXX-XXXX-XXXX */
 export function fmtKey(k: string): string {
   const clean = k.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
   return (clean.match(/.{1,4}/g) ?? []).join("-");
@@ -52,7 +51,7 @@ export function validKey(k: string): boolean {
   return /^[A-Za-z0-9]{24}$/.test(k.replace(/[^A-Za-z0-9]/g, ""));
 }
 
-/** Клиентский отпечаток: разрешение экрана + таймзона + язык + ядер + canvas-hash. */
+/** Отпечаток устройства: экран + таймзона + язык + ядра + canvas-hash. */
 export async function readHwid(): Promise<string> {
   const parts: string[] = [
     `${screen.width}x${screen.height}x${screen.colorDepth}`,
@@ -69,11 +68,11 @@ export async function readHwid(): Promise<string> {
     if (g) {
       g.textBaseline = "top";
       g.font = "14px 'Arial'";
-      g.fillStyle = "#5b21b6";
+      g.fillStyle = "#7f1d1d";
       g.fillRect(0, 0, 220, 40);
-      g.fillStyle = "#f5f5f5";
+      g.fillStyle = "#fef3c7";
       g.fillText("penta-spoof::hwid::7f3a", 4, 8);
-      g.strokeStyle = "rgba(0,180,220,0.6)";
+      g.strokeStyle = "rgba(217,119,6,0.6)";
       g.arc(40, 20, 14, 0, Math.PI * 1.6);
       g.stroke();
     }
